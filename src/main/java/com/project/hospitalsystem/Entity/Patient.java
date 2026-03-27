@@ -7,26 +7,29 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import com.project.hospitalsystem.BloodType.BloodGroupType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Data
+@Getter
 @Entity
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -35,7 +38,8 @@ import lombok.ToString;
 @Table(name = "patients", indexes = {
     @Index(name = "idx_name", columnList = "name"),
     @Index(name = "idx_phone", columnList = "phonenumber"),
-    @Index(name = "idx_bloodGroup", columnList = "bloodGroup")
+    @Index(name = "idx_bloodGroup", columnList = "bloodGroup"),
+    @Index(name = "idx_email", columnList = "email")
 })
 public class Patient {
 
@@ -54,7 +58,8 @@ public class Patient {
     // Not all family members may have a phone number, so we won't use "Unique property" 
     private String phonenumber;
 
-    @Column(nullable = false, length = 10)                   
+    @Column(nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)                  
     private String gender;
 
     // Not all patients may have an email, so we won't use @NotNull in email.
@@ -83,6 +88,11 @@ public class Patient {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false, length = 100)
+    // owner side of the relationship,it stores foreign key
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "insurance_id", nullable = true, unique = true) // nullable = true , because not all patients have insaurance policy
+    private Insurance insurance;
+
+    @Column(nullable = false, length = 14)
     private String password;
 }

@@ -44,7 +44,6 @@ public class PatientModel {
     private LocalDate dateofbirth;
 
     @NotNull(message = "Patient blood group is required for emergencies")
-    @Pattern(regexp = "^(A|B|AB|O)[+-]$", message = "Use format A+, O-")
     private BloodGroupType bloodGroup;
 
     @NotNull(message = "Address is mandatory")
@@ -56,10 +55,10 @@ public class PatientModel {
     private String city;
 
     @NotNull(message = "Pincode is mandatory")
-    @Pattern(regexp = "^[1-9][0-9]$", message = "Invalid Pincode") 
+    @Pattern(regexp = "^^[1-9][0-9]{5}$", message = "Invalid Pincode") 
     private String pincode;
 
     @NotNull(message = "Password is mandatory")
-    @Size(min = 6, max = 100)
+    @Size(min = 8, max = 14)
     private String password;
 }
