@@ -3,11 +3,16 @@ package com.project.hospitalsystem.Service;
 import org.springframework.stereotype.Service;
 
 import com.project.hospitalsystem.Repo.InsuranceRepository;
+import com.project.hospitalsystem.Repo.PatientRepository;
+import com.project.hospitalsystem.Entity.Insurance;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
-public class InsuranceService {
-    private InsuranceRepository insuranceRepository;
+
+public interface InsuranceService {
+    private final InsuranceRepository insuranceRepository;
+    private final PatientRepository patientRepository;
+
+    
 }

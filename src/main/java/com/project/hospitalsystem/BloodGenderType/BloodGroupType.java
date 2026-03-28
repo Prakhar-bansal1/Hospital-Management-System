@@ -1,4 +1,4 @@
-package com.project.hospitalsystem.BloodType;
+package com.project.hospitalsystem.BloodGenderType;
 
 public enum BloodGroupType {
     A_POSITIVE,

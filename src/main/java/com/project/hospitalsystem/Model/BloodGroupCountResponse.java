@@ -1,6 +1,6 @@
 package com.project.hospitalsystem.Model;
 
-import com.project.hospitalsystem.BloodType.BloodGroupType;
+import com.project.hospitalsystem.BloodGenderType.BloodGroupType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.project.hospitalsystem.BloodType.BloodGroupType;
+import com.project.hospitalsystem.BloodGenderType.BloodGroupType;
+import com.project.hospitalsystem.BloodGenderType.GenderType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -20,8 +21,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,10 +36,10 @@ import lombok.ToString;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString(exclude = "password")
 @Table(name = "patients", indexes = {
-    @Index(name = "idx_name", columnList = "name"),
-    @Index(name = "idx_phone", columnList = "phonenumber"),
-    @Index(name = "idx_bloodGroup", columnList = "bloodGroup"),
-    @Index(name = "idx_email", columnList = "email")
+        @Index(name = "idx_name", columnList = "name"),
+        @Index(name = "idx_phone", columnList = "phoneNumber"),
+        @Index(name = "idx_bloodGroup", columnList = "bloodGroup"),
+        @Index(name = "idx_email", columnList = "email")
 })
 public class Patient {
 
@@ -49,50 +49,46 @@ public class Patient {
     private Long id;
 
     @Column(nullable = false, length = 100) // Database-level constraint
-    @Pattern(regexp = "^[a-zA-Z ]+$")     
     private String name;
 
-    @Pattern(regexp = "^[0-9]{10}$")
-    // Regex (Regular Expressions) is a tool to define patterns for string matching.
     @Column(nullable = false, length = 10)
-    // Not all family members may have a phone number, so we won't use "Unique property" 
-    private String phonenumber;
+    // Not all family members may have a phone number, so we won't use "Unique property"
+    private String phoneNumber;
 
     @Column(nullable = false, length = 15)
-    @Enumerated(EnumType.STRING)                  
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private GenderType gender;
 
-    // Not all patients may have an email, so we won't use @NotNull in email.
-    @Email(message = "Invalid email format")  // Format validation
+    // Not all patients may have an email, so we won't use @Notblank in email.
     @Column(unique = true)
     private String email;
 
     @Column(nullable = false)
     private LocalDate dateofbirth;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private BloodGroupType bloodGroup;
 
     @Column(nullable = false, length = 255)
-    private String addressLine1;
+    private String fullAddress;
 
     @Column(nullable = false, length = 100)
     private String city;
 
     @Column(nullable = false, length = 10)
-    @Pattern(regexp = "^[1-9][0-9]{5}$") 
     private String pincode;
 
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    // owner side of the relationship,it stores foreign key
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "insurance_id", nullable = true, unique = true) // nullable = true , because not all patients have insaurance policy
-    private Insurance insurance;
-
-    @Column(nullable = false, length = 14)
+    @Column(nullable = false, length = 255)
     private String password;
+
+    // owner side of the relationship,it stores foreign key
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @JoinColumn(name = "insurance_id", nullable = true, unique = true) 
+    // nullable = true , because not all patients have insaurance policy
+    private Insurance insurance;
 }
