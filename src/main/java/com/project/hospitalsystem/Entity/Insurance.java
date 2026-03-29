@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Future;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,10 +37,12 @@ public class Insurance {
     @Column(nullable = false, length = 100)
     private String insuranceProvider;
 
+    @Future
     @Column(nullable = false)
     private LocalDate expiryDate;
+
     public boolean isExpired() {
     return expiryDate != null && expiryDate.isBefore(LocalDate.now());
-}
+    }
 
 }

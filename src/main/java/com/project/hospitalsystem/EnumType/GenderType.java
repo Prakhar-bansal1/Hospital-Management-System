@@ -1,4 +1,4 @@
-package com.project.hospitalsystem.BloodGenderType;
+package com.project.hospitalsystem.EnumType;
 
 public enum GenderType {
     MALE,

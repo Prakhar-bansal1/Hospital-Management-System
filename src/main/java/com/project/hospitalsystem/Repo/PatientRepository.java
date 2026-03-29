@@ -12,9 +12,13 @@ import com.project.hospitalsystem.Entity.Patient;
 import com.project.hospitalsystem.Model.BloodGroupCountResponse;
 
 public interface PatientRepository extends JpaRepository<Patient, Long>{
-   Slice<Patient> findByNameStartingWithIgnoreCaseOrPhoneNumber(String name, String phoneNumber, Pageable pageable );
+   Slice<Patient> findByNameStartingWithIgnoreCase(String name, Pageable pageable );
+
+   Slice<Patient> findByPhoneNumber(String phoneNumber, Pageable pageable);
 
    Optional<Patient> findByInsuranceId(Long insuranceId);
+   
+   Optional<Patient> findByEmail(String email);
    
    // Custom query to count patients by blood group
    @Query("Select new com.project.hospitalsystem.Model.BloodGroupCountResponse(p.bloodGroup, count(p)) from Patient p group by p.bloodGroup")

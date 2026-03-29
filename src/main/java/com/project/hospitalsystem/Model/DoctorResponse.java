@@ -2,8 +2,8 @@ package com.project.hospitalsystem.Model;
 
 import java.time.LocalDate;
 
-import com.project.hospitalsystem.BloodGenderType.BloodGroupType;
-import com.project.hospitalsystem.BloodGenderType.GenderType;
+import com.project.hospitalsystem.EnumType.BloodGroupType;
+import com.project.hospitalsystem.EnumType.GenderType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

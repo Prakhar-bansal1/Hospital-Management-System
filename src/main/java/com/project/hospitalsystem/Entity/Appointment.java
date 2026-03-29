@@ -1,11 +1,16 @@
 package com.project.hospitalsystem.Entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.project.hospitalsystem.EnumType.AppointmentStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,7 +35,7 @@ import lombok.ToString;
 @Table(name = "appointments", indexes = {
     @Index(name = "idx_appt_patient_id", columnList = "patient_id"), 
     @Index(name = "idx_appt_doctor_id", columnList = "doctor_id"),
-    @Index(name = "idx_appointment_time",columnList = "appointmentTime")
+    @Index(name = "idx_appointment_date",columnList = "appointmentDate")
 })
 public class Appointment {
     
@@ -40,11 +45,16 @@ public class Appointment {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime appointmentTime;
+    private LocalDate appointmentDate;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(nullable = false, length = 15)
+    private AppointmentStatus status = AppointmentStatus.SCHEDULED; // default value shows when patient book an appontment
 
     @ManyToOne(fetch = FetchType.LAZY)  // owner side, because a patient can have many appointments
     @JoinColumn(name = "patient_id", nullable = false)

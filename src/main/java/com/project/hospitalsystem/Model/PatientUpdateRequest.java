@@ -1,6 +1,6 @@
 package com.project.hospitalsystem.Model;
 
-import com.project.hospitalsystem.BloodGenderType.BloodGroupType;
+import com.project.hospitalsystem.EnumType.BloodGroupType;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

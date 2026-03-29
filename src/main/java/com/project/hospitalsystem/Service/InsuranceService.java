@@ -11,8 +11,5 @@ import lombok.RequiredArgsConstructor;
 @Service
 
 public interface InsuranceService {
-    private final InsuranceRepository insuranceRepository;
-    private final PatientRepository patientRepository;
-
     
 }

@@ -5,8 +5,8 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
-import com.project.hospitalsystem.BloodGenderType.BloodGroupType;
-import com.project.hospitalsystem.BloodGenderType.GenderType;
+import com.project.hospitalsystem.EnumType.BloodGroupType;
+import com.project.hospitalsystem.EnumType.GenderType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -86,9 +86,7 @@ public class Patient {
     @Column(nullable = false, length = 255)
     private String password;
 
-    // owner side of the relationship,it stores foreign key
-    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-    @JoinColumn(name = "insurance_id", nullable = true, unique = true) 
-    // nullable = true , because not all patients have insaurance policy
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "insurance_id", nullable = true) 
     private Insurance insurance;
 }
