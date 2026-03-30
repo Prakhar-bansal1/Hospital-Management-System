@@ -33,8 +33,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Table(name = "doctors", indexes = {
-    @Index(name = "idx_doctor_name", columnList = "name"),
-    @Index(name = "idx_doctor_email", columnList = "email")
+    @Index(name = "idx_specialization", columnList = "specialization"),
+    @Index(name = "idx_department_name", columnList = "department_name")
 })
 public class Doctor {
     @Id
@@ -66,6 +66,12 @@ public class Doctor {
 
     @Column(nullable = false)
     private LocalDate dateOfBirth;
+
+    @Column(nullable = false, length = 255)
+    private String qualification; 
+    
+    @Column(nullable = false)
+    private double consultationFee; 
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

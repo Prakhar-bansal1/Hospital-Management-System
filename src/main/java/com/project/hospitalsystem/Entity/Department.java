@@ -24,7 +24,7 @@ public class Department {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 100)
-    private String name;
+    private String departmentName;
 
     @Column(nullable = false)
     @Builder.Default

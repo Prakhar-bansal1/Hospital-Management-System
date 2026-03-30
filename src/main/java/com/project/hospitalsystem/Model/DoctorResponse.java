@@ -23,6 +23,7 @@ public class DoctorResponse {
     private GenderType gender;
     private String specialization;
     private String licenseNumber;
+    private String qualification;
 
     private Long departmentId;
     private String departmentName;

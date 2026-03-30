@@ -55,6 +55,13 @@ public class DoctorRequest {
         @NotBlank
         private String email;
 
+        @NotBlank
+        @Size(max = 255)
+        private String qualification;
+
+        @NotNull
+        private Double consultationFee;
+
         @NotNull
         private String departmentId;
 
