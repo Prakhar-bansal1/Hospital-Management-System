@@ -13,7 +13,7 @@ public class AppointmentRequest {
 
     @Column(nullable = false)
     private LocalDate appointmentDate;
-
+    
     @Column(nullable = false)
     private Patient patient;
 

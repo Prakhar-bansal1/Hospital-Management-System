@@ -14,7 +14,7 @@ import com.project.hospitalsystem.Model.BloodGroupCountResponse;
 public interface PatientRepository extends JpaRepository<Patient, Long>{
    Slice<Patient> findByNameStartingWithIgnoreCase(String name, Pageable pageable );
 
-   Slice<Patient> findByPhoneNumber(String phoneNumber, Pageable pageable);
+   Optional<Patient> findByPhoneNumber(String phoneNumber);
 
    Optional<Patient> findByInsuranceId(Long insuranceId);
    

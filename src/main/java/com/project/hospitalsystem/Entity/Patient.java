@@ -30,7 +30,7 @@ import lombok.ToString;
 
 @Getter
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @ToString(exclude = "password")
@@ -77,6 +77,10 @@ public class Patient {
 
     @Column(nullable = false, length = 10)
     private String pincode;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 
     @CreationTimestamp
     @Column(updatable = false)

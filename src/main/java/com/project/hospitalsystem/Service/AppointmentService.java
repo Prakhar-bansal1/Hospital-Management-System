@@ -1,6 +1,7 @@
 package com.project.hospitalsystem.Service;
 
-public interface AppointmentService {
+public interface AppointmentService extends PatientService {
 
+    
     
 }

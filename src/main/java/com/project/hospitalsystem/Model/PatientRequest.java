@@ -32,7 +32,7 @@ public class PatientRequest {
     // regex allows only Letters and Spaces in name
     private String name;
 
-    @NotBlank(message = "Patient gender is mandatory")
+    @NotNull(message = "Patient gender is mandatory")
     private GenderType gender;
 
     @Email(message = "Invalid email format")
