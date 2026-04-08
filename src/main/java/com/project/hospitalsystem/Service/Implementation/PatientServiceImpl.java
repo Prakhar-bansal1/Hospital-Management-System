@@ -5,6 +5,7 @@ import com.project.hospitalsystem.Entity.Patient;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Repo.InsuranceRepository;
 import com.project.hospitalsystem.Repo.PatientRepository;
+import com.project.hospitalsystem.Service.InsuranceService;
 import com.project.hospitalsystem.Service.PatientService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,7 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final InsuranceRepository insuranceRepository;
+    private final InsuranceService insuranceService;
 
     @Override
     @Transactional
@@ -71,15 +73,15 @@ public class PatientServiceImpl implements PatientService {
             insurance = insuranceRepository.findByPolicyNumber(policyNumber)
                 .orElseGet(() -> {
 
-                    Insurance newInsurance = Insurance.builder()
-                        .policyNumber(policyNumber)
-                        .insuranceProvider(request.getInsurance().getInsuranceProvider())
-                        .expiryDate(request.getInsurance().getExpiryDate())
-                        .build();
-                        if (newInsurance==null) {
-                            throw new IllegalStateException("Failed to build insurance ");
-                        }
-                        return insuranceRepository.save(newInsurance);
+                    // Insurance newInsurance = Insurance.builder()
+                    //     .policyNumber(policyNumber)
+                    //     .insuranceProvider(request.getInsurance().getInsuranceProvider())
+                    //     .expiryDate(request.getInsurance().getExpiryDate())
+                    //     .build();
+                    //     if (newInsurance==null) {
+                    //         throw new IllegalStateException("Failed to build insurance ");
+                    //     }
+                        return insuranceService.manageInsurance(request.getInsurance());
                     }
                 );
         }
