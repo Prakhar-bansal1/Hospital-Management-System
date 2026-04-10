@@ -33,28 +33,28 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Table(name = "doctors", indexes = {
-    @Index(name = "idx_specialization", columnList = "specialization"),
-    @Index(name = "idx_department_name", columnList = "department_name")
+        @Index(name = "idx_specialization", columnList = "specialization"),
+        @Index(name = "idx_department_id", columnList = "department_id")
 })
 public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(updatable = false)
+    @Column(nullable = false, updatable = false)
     private Long id;
 
-    @Column(nullable=false, length = 100)
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Enumerated(EnumType.STRING)
     private GenderType gender;
 
-    @Column(nullable = false,length = 100)
+    @Column(nullable = false, length = 100)
     private String specialization;
 
     @Column(nullable = false, unique = true, length = 10)
     private String licenseNumber;
 
-    @Column(nullable = false,length = 10, unique = true)
+    @Column(nullable = false, length = 10, unique = true)
     private String phoneNumber;
 
     @Column(nullable = false, unique = true)
@@ -68,10 +68,10 @@ public class Doctor {
     private LocalDate dateOfBirth;
 
     @Column(nullable = false, length = 255)
-    private String qualification; 
-    
+    private String qualification;
+
     @Column(nullable = false)
-    private double consultationFee; 
+    private double consultationFee;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -80,7 +80,7 @@ public class Doctor {
     @Column(nullable = false, length = 255)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // owner side because many doctors can have one department
+    @ManyToOne(fetch = FetchType.LAZY) // owner side because many doctors can have one department
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 }

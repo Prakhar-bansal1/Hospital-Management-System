@@ -8,6 +8,6 @@ import com.project.hospitalsystem.Entity.Department;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
     
-    Optional<Department> findByNameIgnoringCase(String name);
+    Optional<Department> findBydepartmentNameIgnoringCase(String name);
 
 }

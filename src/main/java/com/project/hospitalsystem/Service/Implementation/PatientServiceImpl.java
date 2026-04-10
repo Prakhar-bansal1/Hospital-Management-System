@@ -2,7 +2,9 @@ package com.project.hospitalsystem.Service.Implementation;
 
 import com.project.hospitalsystem.Entity.Insurance;
 import com.project.hospitalsystem.Entity.Patient;
+import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.PatientRequest;
+import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Repo.InsuranceRepository;
 import com.project.hospitalsystem.Repo.PatientRepository;
 import com.project.hospitalsystem.Service.InsuranceService;
@@ -21,10 +23,11 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
     private final InsuranceRepository insuranceRepository;
     private final InsuranceService insuranceService;
+    private final HospitalMapper hospitalMapper;
 
     @Override
     @Transactional
-    public String registerPatient(PatientRequest request){
+    public PatientResponse registerPatient(PatientRequest request){
         if (request == null || request.getPhoneNumber() == null || request.getDateofbirth() == null) {
             throw new RuntimeException("Invalid data provided");
         }
@@ -42,7 +45,7 @@ public class PatientServiceImpl implements PatientService {
                 .orElseGet(() -> createNewPatient(request));
     }
 
-    private String reactivateExistingPatient(Patient existing, PatientRequest request) {
+    private PatientResponse reactivateExistingPatient(Patient existing, PatientRequest request) {
         Patient reactivated = existing.toBuilder()
             .active(true)
             .password(request.getPassword())
@@ -63,10 +66,10 @@ public class PatientServiceImpl implements PatientService {
                 throw new IllegalStateException("Failed to reactivate patient");
             }
         patientRepository.save(reactivated);
-        return " Identity verified, Welcome Back!";
+        return hospitalMapper.mapPatientResponse(reactivated);
     }
 
-    private String createNewPatient(PatientRequest request) {
+    private PatientResponse createNewPatient(PatientRequest request) {
         Insurance insurance = null;
         if (request.getInsurance() != null && request.getInsurance().getPolicyNumber() != null) {
             String policyNumber = request.getInsurance().getPolicyNumber();
@@ -104,7 +107,7 @@ public class PatientServiceImpl implements PatientService {
                 throw new IllegalStateException("Failed to build Patient");
             }
         Patient saved = patientRepository.save(newPatient);
-        return "Registration successful! Your Patient ID is: " + saved.getId();
+        return hospitalMapper.mapPatientResponse(saved);
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.project.hospitalsystem.Entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -30,15 +31,15 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
-@ToString(exclude = {"patient", "doctor"})
+@Builder(toBuilder = true)
+@ToString(exclude = { "patient", "doctor" })
 @Table(name = "appointments", indexes = {
-    @Index(name = "idx_appt_patient_id", columnList = "patient_id"), 
-    @Index(name = "idx_appt_doctor_id", columnList = "doctor_id"),
-    @Index(name = "idx_appointment_date",columnList = "appointmentDate")
+        @Index(name = "idx_appt_patient_id", columnList = "patient_id"),
+        @Index(name = "idx_appt_doctor_id", columnList = "doctor_id"),
+        @Index(name = "idx_appointment_date", columnList = "appointmentDate")
 })
 public class Appointment {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
@@ -46,6 +47,9 @@ public class Appointment {
 
     @Column(nullable = false)
     private LocalDate appointmentDate;
+
+    @Column(nullable = false)
+    private LocalTime appointmentTime;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -56,12 +60,12 @@ public class Appointment {
     @Column(nullable = false, length = 15)
     private AppointmentStatus status = AppointmentStatus.SCHEDULED; // default value shows when patient book an appontment
 
-    @ManyToOne(fetch = FetchType.LAZY)  // owner side, because a patient can have many appointments
+    @ManyToOne(fetch = FetchType.LAZY) // owner side, because a patient can have many appointments
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 
-    @ManyToOne(fetch = FetchType.LAZY)  // owner side, because a doctor can have many appointments
-    @JoinColumn(name= "doctor_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY) // owner side, because a doctor can have many appointments
+    @JoinColumn(name = "doctor_id", nullable = false)
     private Doctor doctor;
 
 }

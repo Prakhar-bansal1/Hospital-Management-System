@@ -1,6 +1,7 @@
 package com.project.hospitalsystem.Model;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import com.project.hospitalsystem.EnumType.AppointmentStatus;
 
@@ -14,9 +15,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AppointmentResponse {
-    
+
     private Long appointmentId;
     private LocalDate appointmentDate;
+    private LocalTime appointmentTime;
     private AppointmentStatus status;
 
     private String patientName;
@@ -29,5 +31,5 @@ public class AppointmentResponse {
     private String departmentName;
 
     private String bookingTimestamp;
-    
+
 }

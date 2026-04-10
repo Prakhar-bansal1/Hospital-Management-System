@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class AppointmentStatusUpdate {
-    
+
     @NotNull
     private AppointmentStatus status;
 

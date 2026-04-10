@@ -6,12 +6,14 @@ import com.project.hospitalsystem.EnumType.BloodGroupType;
 import com.project.hospitalsystem.EnumType.GenderType;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DoctorResponse {
 
     private Long id;

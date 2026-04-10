@@ -51,7 +51,8 @@ public class Patient {
     private String name;
 
     @Column(nullable = false, length = 10)
-    // Not all family members may have a phone number, so we won't use "Unique property"
+    // Not all family members may have a phone number, so we won't use "Unique
+    // property"
     private String phoneNumber;
 
     @Column(nullable = false, length = 15)
@@ -90,6 +91,6 @@ public class Patient {
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "insurance_id", nullable = true) 
+    @JoinColumn(name = "insurance_id", nullable = true)
     private Insurance insurance;
 }

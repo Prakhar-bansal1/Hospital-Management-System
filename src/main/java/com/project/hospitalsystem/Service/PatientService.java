@@ -1,10 +1,9 @@
 package com.project.hospitalsystem.Service;
 
 import com.project.hospitalsystem.Model.PatientRequest;
-
-import java.lang.String;
+import com.project.hospitalsystem.Model.PatientResponse;
 
 public interface PatientService {
-    String registerPatient(PatientRequest request);
+    PatientResponse registerPatient(PatientRequest request);
     void deactivatePatient(Long id);
 }
