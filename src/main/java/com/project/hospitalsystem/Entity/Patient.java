@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
@@ -47,9 +48,11 @@ public class Patient {
     @Column(nullable = false, updatable = false)
     private Long id;
 
+    @Setter
     @Column(nullable = false, length = 100) // Database-level constraint
     private String name;
 
+    @Setter
     @Column(nullable = false, length = 10)
     // Not all family members may have a phone number, so we won't use "Unique
     // property"
@@ -60,22 +63,27 @@ public class Patient {
     private GenderType gender;
 
     // Not all patients may have an email, so we won't use @Notblank in email.
+    @Setter
     @Column(unique = true)
     private String email;
 
     @Column(nullable = false)
     private LocalDate dateofbirth;
 
+    @Setter
     @Column(nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private BloodGroupType bloodGroup;
 
+    @Setter
     @Column(nullable = false, length = 255)
     private String fullAddress;
 
+    @Setter
     @Column(nullable = false, length = 100)
     private String city;
 
+    @Setter
     @Column(nullable = false, length = 10)
     private String pincode;
 

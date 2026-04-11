@@ -12,6 +12,7 @@ import com.project.hospitalsystem.Entity.Doctor;
 import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.DoctorRequest;
 import com.project.hospitalsystem.Model.DoctorResponse;
+import com.project.hospitalsystem.Model.DoctorSummaryModel;
 import com.project.hospitalsystem.Repo.DepartmentRepository;
 import com.project.hospitalsystem.Repo.DoctorRepository;
 import com.project.hospitalsystem.Service.DoctorService;
@@ -76,9 +77,23 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Override
+    public List<DoctorSummaryModel> getAllDoctorsForPatients() {
+        return doctorRepository.findAll().stream()
+                .map(hospitalMapper::mapDoctorSummary)
+                .toList();
+    }
+
+    @Override
     public List<DoctorResponse> getAllDoctors() {
         return doctorRepository.findAll().stream()
                 .map(hospitalMapper::mapDoctorResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DoctorSummaryModel> getAllDoctorsSummary() {
+        return doctorRepository.findAll().stream()
+                .map(hospitalMapper::mapDoctorSummary)
                 .collect(Collectors.toList());
     }
 }

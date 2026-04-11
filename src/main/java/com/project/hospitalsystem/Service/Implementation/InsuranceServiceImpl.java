@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class InsuranceServiceImpl implements InsuranceService{
+public class InsuranceServiceImpl implements InsuranceService {
     private final InsuranceRepository insuranceRepository;
 
     @Override
@@ -39,10 +39,10 @@ public class InsuranceServiceImpl implements InsuranceService{
 
     }
 
-  @Override
+    @Override
     public Insurance getInsuranceByPolicyNumber(String policyNumber) {
         return insuranceRepository.findByPolicyNumber(policyNumber)
-        .orElseThrow(()-> new RuntimeException("Insurance not found with policy number: " + policyNumber));
+                .orElseThrow(() -> new RuntimeException("Insurance not found with policy number: " + policyNumber));
     }
 
 }

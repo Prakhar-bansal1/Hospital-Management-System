@@ -5,6 +5,7 @@ import com.project.hospitalsystem.Entity.Patient;
 import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
+import com.project.hospitalsystem.Model.PatientUpdateRequest;
 import com.project.hospitalsystem.Repo.InsuranceRepository;
 import com.project.hospitalsystem.Repo.PatientRepository;
 import com.project.hospitalsystem.Service.InsuranceService;
@@ -13,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 @RequiredArgsConstructor
@@ -27,13 +27,14 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public PatientResponse registerPatient(PatientRequest request){
+    public PatientResponse registerPatient(PatientRequest request) {
         if (request == null || request.getPhoneNumber() == null || request.getDateofbirth() == null) {
             throw new RuntimeException("Invalid data provided");
         }
         return patientRepository.findByPhoneNumber(request.getPhoneNumber())
                 .map(existing -> {
-                    if (existing.getDateofbirth() != null && existing.getDateofbirth().equals(request.getDateofbirth())) {
+                    if (existing.getDateofbirth() != null
+                            && existing.getDateofbirth().equals(request.getDateofbirth())) {
                         if (existing.isActive()) {
                             throw new RuntimeException("Error: This profile is already registered!");
                         }
@@ -47,24 +48,24 @@ public class PatientServiceImpl implements PatientService {
 
     private PatientResponse reactivateExistingPatient(Patient existing, PatientRequest request) {
         Patient reactivated = existing.toBuilder()
-            .active(true)
-            .password(request.getPassword())
-            .email(request.getEmail())
-            .phoneNumber(request.getPhoneNumber())
-            .fullAddress(request.getFullAddress())
-            .city(request.getCity())
-            .pincode(request.getPincode())
-            .name(request.getName())
+                .active(true)
+                .password(request.getPassword())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .fullAddress(request.getFullAddress())
+                .city(request.getCity())
+                .pincode(request.getPincode())
+                .name(request.getName())
 
-            .gender(existing.getGender())
-            .insurance(existing.getInsurance())
-            .bloodGroup(existing.getBloodGroup())
-            .dateofbirth(existing.getDateofbirth())
-            .build();
+                .gender(existing.getGender())
+                .insurance(existing.getInsurance())
+                .bloodGroup(existing.getBloodGroup())
+                .dateofbirth(existing.getDateofbirth())
+                .build();
 
-            if (reactivated==null) {
-                throw new IllegalStateException("Failed to reactivate patient");
-            }
+        if (reactivated == null) {
+            throw new IllegalStateException("Failed to reactivate patient");
+        }
         patientRepository.save(reactivated);
         return hospitalMapper.mapPatientResponse(reactivated);
     }
@@ -74,57 +75,72 @@ public class PatientServiceImpl implements PatientService {
         if (request.getInsurance() != null && request.getInsurance().getPolicyNumber() != null) {
             String policyNumber = request.getInsurance().getPolicyNumber();
             insurance = insuranceRepository.findByPolicyNumber(policyNumber)
-                .orElseGet(() -> {
+                    .orElseGet(() -> {
 
-                    // Insurance newInsurance = Insurance.builder()
-                    //     .policyNumber(policyNumber)
-                    //     .insuranceProvider(request.getInsurance().getInsuranceProvider())
-                    //     .expiryDate(request.getInsurance().getExpiryDate())
-                    //     .build();
-                    //     if (newInsurance==null) {
-                    //         throw new IllegalStateException("Failed to build insurance ");
-                    //     }
+                        // Insurance newInsurance = Insurance.builder()
+                        // .policyNumber(policyNumber)
+                        // .insuranceProvider(request.getInsurance().getInsuranceProvider())
+                        // .expiryDate(request.getInsurance().getExpiryDate())
+                        // .build();
+                        // if (newInsurance==null) {
+                        // throw new IllegalStateException("Failed to build insurance ");
+                        // }
                         return insuranceService.manageInsurance(request.getInsurance());
-                    }
-                );
+                    });
         }
         Patient newPatient = Patient.builder()
-            .name(request.getName())
-            .dateofbirth(request.getDateofbirth())
-            .phoneNumber(request.getPhoneNumber())
-            .email(request.getEmail())
-            .password(request.getPassword())
-            .bloodGroup(request.getBloodGroup())
-            .fullAddress(request.getFullAddress())
-            .city(request.getCity())
-            .pincode(request.getPincode())
-            .gender(request.getGender())
-            .active(true)
-            .insurance(insurance)
-            .build();
+                .name(request.getName())
+                .dateofbirth(request.getDateofbirth())
+                .phoneNumber(request.getPhoneNumber())
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .bloodGroup(request.getBloodGroup())
+                .fullAddress(request.getFullAddress())
+                .city(request.getCity())
+                .pincode(request.getPincode())
+                .gender(request.getGender())
+                .active(true)
+                .insurance(insurance)
+                .build();
 
-            if (newPatient==null){
-                throw new IllegalStateException("Failed to build Patient");
-            }
+        if (newPatient == null) {
+            throw new IllegalStateException("Failed to build Patient");
+        }
         Patient saved = patientRepository.save(newPatient);
         return hospitalMapper.mapPatientResponse(saved);
     }
 
     @Override
-        @Transactional
-        public void deactivatePatient(Long id){
-    if (id == null) {
-        throw new IllegalArgumentException("Patient ID cannot be null");
-    }
+    @Transactional
+    public void deactivatePatient(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
 
-            Patient patient = patientRepository.findById(id)
+        Patient patient = patientRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Patient record not found "));
-            Patient deactivatedPatient = patient.toBuilder()
-            .active(false)
-            .build();
+        Patient deactivatedPatient = patient.toBuilder()
+                .active(false)
+                .build();
 
-            if (deactivatedPatient != null) {
+        if (deactivatedPatient != null) {
             patientRepository.save(deactivatedPatient);
         }
+    }
+
+    @Override
+    @Transactional
+    public PatientResponse updatePatient(Long id, PatientUpdateRequest request) {
+        if (id == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
+        Patient existingPatient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+        hospitalMapper.updatePatientFromRequest(request, existingPatient);
+        if (existingPatient == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
+        Patient savedPatient = patientRepository.save(existingPatient);
+        return hospitalMapper.mapPatientResponse(savedPatient);
     }
 }

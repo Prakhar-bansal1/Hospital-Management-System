@@ -8,7 +8,9 @@ import org.springframework.validation.annotation.Validated;
 import com.project.hospitalsystem.Entity.Doctor;
 import com.project.hospitalsystem.Entity.Patient;
 import com.project.hospitalsystem.Model.DoctorResponse;
+import com.project.hospitalsystem.Model.DoctorSummaryModel;
 import com.project.hospitalsystem.Model.PatientResponse;
+import com.project.hospitalsystem.Model.PatientUpdateRequest;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -16,10 +18,11 @@ import jakarta.validation.constraints.NotNull;
 @Validated
 public class HospitalMapper {
     public DoctorResponse mapDoctorResponse(Doctor doctor) {
-        if (doctor == null){
+        if (doctor == null) {
             throw new IllegalArgumentException("Doctor cannot be null");
         }
-        @NotNull Long entityId=doctor.getId();
+        @NotNull
+        Long entityId = doctor.getId();
         if (entityId == null) {
             throw new IllegalStateException("Doctor ID cannot be null");
         }
@@ -64,5 +67,32 @@ public class HospitalMapper {
                         && patient.getInsurance().getExpiryDate().isAfter(LocalDate.now()))
                 .build();
 
+    }
+
+    public DoctorSummaryModel mapDoctorSummary(Doctor doctor) {
+        if (doctor == null)
+            return null;
+
+        return DoctorSummaryModel.builder()
+                .id(doctor.getId())
+                .name(doctor.getName())
+                .specialization(doctor.getSpecialization())
+                .departmentName(doctor.getDepartment() != null ? doctor.getDepartment().getDepartmentName() : "N/A")
+                .qualification(doctor.getQualification())
+                .consultationFee(doctor.getConsultationFee())
+                .isAvailableToday(true)
+                .build();
+    }
+
+    public void updatePatientFromRequest(PatientUpdateRequest request, Patient patient) {
+        if (request == null || patient == null)
+            return;
+        patient.setName(request.getName());
+        patient.setEmail(request.getEmail());
+        patient.setPhoneNumber(request.getPhoneNumber());
+        patient.setBloodGroup(request.getBloodGroup());
+        patient.setFullAddress(request.getFullAddress());
+        patient.setCity(request.getCity());
+        patient.setPincode(request.getPincode());
     }
 }
