@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.project.hospitalsystem.Entity.Appointment;
@@ -94,15 +95,17 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentMapper.mapAppointmentResponse(appointment);
     }
 
-    @Override
-    @Transactional
-    public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateRequest) {
-        if (id == null) {
-            throw new IllegalArgumentException("Appointment ID must be provided!");
-        }
-        Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
-
+@Override
+@Transactional
+public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateRequest, Long authenticatedDoctorId) {
+    if (id == null) {
+        throw new IllegalArgumentException("Appointment ID must be provided!");
+    }
+    Appointment appointment = appointmentRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+    if (!appointment.getDoctor().getId().equals(authenticatedDoctorId)) {
+        throw new AccessDeniedException("Security Alert: Unauthorized update attempt detected!");
+    }
         Appointment update = appointment.toBuilder()
                 .status(updateRequest.getStatus())
                 .build();
@@ -112,6 +115,8 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return appointmentMapper.mapAppointmentResponse(appointmentRepository.save(update));
     }
+
+    
 
     @Override
     public Slice<AppointmentResponse> getAppointmentsByPatient(Long patientId, Pageable pageable) {
@@ -128,6 +133,31 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new IllegalArgumentException("Doctor Id required");
         }
         return appointmentRepository.findByDoctor_IdAndAppointmentDate(doctorId, LocalDate.now(), pageable)
+                .map(appointmentMapper::mapAppointmentResponse);
+    }
+
+    @Override
+    public Slice<AppointmentResponse> getAppointmentsByPatientUser(Long userId, Pageable pageable) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User Id required");
+        }
+        Patient patient = patientRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Patient profile not found for this user"));
+        return appointmentRepository.findByPatient_Id(patient.getId(), pageable)
+                .map(appointmentMapper::mapAppointmentResponse);
+    }
+
+    @Override
+    public Slice<AppointmentResponse> getAppointmentsByDoctorUser(Long userId, Pageable pageable) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User Id required");
+        }
+        Doctor doctor = doctorRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Doctor profile not found for this user"));
+
+        // 2. Fetch schedule (usually for current date/future)
+        return appointmentRepository
+                .findByDoctor_IdAndAppointmentDate(doctor.getId(), java.time.LocalDate.now(), pageable)
                 .map(appointmentMapper::mapAppointmentResponse);
     }
 }

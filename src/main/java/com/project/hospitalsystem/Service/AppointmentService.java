@@ -12,9 +12,13 @@ public interface AppointmentService {
 
     AppointmentResponse getAppointmentById(Long id);
 
-    AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateRequest);
+    AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateRequest, Long authenticatedDoctorId);
 
     Slice<AppointmentResponse> getAppointmentsByPatient(Long patientId, Pageable pageable);
 
     Slice<AppointmentResponse> getAppointmentsByDoctor(Long doctorId, Pageable pageable);
+
+    Slice<AppointmentResponse> getAppointmentsByPatientUser(Long userId, Pageable pageable);
+
+    Slice<AppointmentResponse> getAppointmentsByDoctorUser(Long userId, Pageable pageable);
 }

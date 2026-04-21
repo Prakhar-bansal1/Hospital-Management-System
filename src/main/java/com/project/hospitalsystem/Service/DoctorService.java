@@ -15,5 +15,5 @@ public interface DoctorService {
 
     List<DoctorSummaryModel> getAllDoctorsSummary();
 
-     List<DoctorSummaryModel> getAllDoctorsForPatients();
+    List<DoctorSummaryModel> getAllDoctorsForPatients();
 }

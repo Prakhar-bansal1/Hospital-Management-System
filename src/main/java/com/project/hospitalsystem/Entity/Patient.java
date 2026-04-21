@@ -8,7 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 import com.project.hospitalsystem.EnumType.BloodGroupType;
 import com.project.hospitalsystem.EnumType.GenderType;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,14 +29,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+// import lombok.ToString;
 
 @Getter
 @Entity
 @Builder(toBuilder = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@ToString(exclude = "password")
+// @ToString(exclude = "password")
 @Table(name = "patients", indexes = {
         @Index(name = "idx_name", columnList = "name"),
         @Index(name = "idx_phone", columnList = "phoneNumber"),
@@ -101,4 +103,10 @@ public class Patient {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "insurance_id", nullable = true)
     private Insurance insurance;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role_name")
+    private Role roles;
 }
