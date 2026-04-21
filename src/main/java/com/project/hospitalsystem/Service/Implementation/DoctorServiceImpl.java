@@ -1,7 +1,6 @@
 package com.project.hospitalsystem.Service.Implementation;
 
 import java.util.List;
-
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -52,7 +51,6 @@ public class DoctorServiceImpl implements DoctorService {
                 .email(request.getEmail())
                 .qualification(request.getQualification())
                 .consultationFee(request.getConsultationFee())
-                .password(request.getPassword())
                 .department(department)
                 .build();
         if (doctor.getEmail() == null || doctor.getLicenseNumber() == null) {
@@ -79,6 +77,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Override
     public List<DoctorSummaryModel> getAllDoctorsForPatients() {
         return doctorRepository.findAll().stream()
+                .filter(doctor -> doctor.getDepartment() != null && doctor.getDepartment().isActive())
                 .map(hospitalMapper::mapDoctorSummary)
                 .toList();
     }

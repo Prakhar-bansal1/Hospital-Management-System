@@ -12,6 +12,8 @@ import com.project.hospitalsystem.Service.InsuranceService;
 import com.project.hospitalsystem.Service.PatientService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Pageable; 
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +51,6 @@ public class PatientServiceImpl implements PatientService {
     private PatientResponse reactivateExistingPatient(Patient existing, PatientRequest request) {
         Patient reactivated = existing.toBuilder()
                 .active(true)
-                .password(request.getPassword())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .fullAddress(request.getFullAddress())
@@ -88,12 +89,12 @@ public class PatientServiceImpl implements PatientService {
                         return insuranceService.manageInsurance(request.getInsurance());
                     });
         }
+
         Patient newPatient = Patient.builder()
                 .name(request.getName())
                 .dateofbirth(request.getDateofbirth())
                 .phoneNumber(request.getPhoneNumber())
                 .email(request.getEmail())
-                .password(request.getPassword())
                 .bloodGroup(request.getBloodGroup())
                 .fullAddress(request.getFullAddress())
                 .city(request.getCity())
@@ -142,5 +143,24 @@ public class PatientServiceImpl implements PatientService {
         }
         Patient savedPatient = patientRepository.save(existingPatient);
         return hospitalMapper.mapPatientResponse(savedPatient);
+    }
+
+    @Override
+    public PatientResponse getPatientById(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+        return hospitalMapper.mapPatientResponse(patient);
+    }
+
+    @Override
+    public Slice<PatientResponse> getAllPatients(Pageable pageable) {
+        if (pageable == null) {
+        throw new IllegalArgumentException("Pagination information (Pageable) cannot be null");
+    }
+       return patientRepository.findAll(pageable)
+                .map(hospitalMapper::mapPatientResponse);
     }
 }
