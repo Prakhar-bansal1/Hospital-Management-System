@@ -35,21 +35,24 @@ public class AuthService {
     }
 
     public SignupResponseModel signup(SignupRequestModel signupRequestModel) {
-        User user = userRepository.findByUsername(signupRequestModel.getEmail()).orElse(null);
-       if (signupRequestModel.getEmail() == null || signupRequestModel.getPassword() == null) {
+        User user = userRepository.findByEmail(signupRequestModel.getEmail()).orElse(null);
+        if (signupRequestModel.getEmail() == null || signupRequestModel.getPassword() == null) {
             throw new IllegalArgumentException("Email and Password cannot be null");
-        } 
+        }
         if (user != null)
             throw new IllegalArgumentException("User already exists");
-        
+
         User newUser = User.builder()
                 .email(signupRequestModel.getEmail())
                 .password(signupRequestModel.getPassword())
                 .roles(Set.of(Role.PATIENT))
                 .isActive(true)
                 .build();
-       // need check----------
-                User savedUser = userRepository.save(newUser);
+        // need check----------> fix done
+        if (newUser == null) {
+            return null;
+        }
+        User savedUser = userRepository.save(newUser);
         return new SignupResponseModel(savedUser.getEmail(), savedUser.getId());
     }
 }
