@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.project.hospitalsystem.EnumType.AuthProvidertype;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -32,8 +30,8 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "users",indexes = {
-        @Index(name = "provider_id_provider_type", columnList = "provider_id,provider"),}
+@Table(name = "users", indexes = {
+        @Index(name = "provider_id_provider_type", columnList = "provider_id,provider"), }
 
 )
 public class User {
@@ -53,10 +51,6 @@ public class User {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
-
-    private String providerId;
-    @Enumerated(EnumType.STRING)
-    private AuthProvidertype provider;
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
