@@ -8,6 +8,8 @@ import com.project.hospitalsystem.Model.AppointmentResponse;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Model.PatientUpdateRequest;
+import com.project.hospitalsystem.Model.PasswordResetRequest;
+import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Service.AppointmentService;
 import com.project.hospitalsystem.Service.PatientService;
 
@@ -62,6 +64,14 @@ public class PatientController {
     public ResponseEntity<Void> deactivatepatient(@PathVariable Long id) {
         patientService.deactivatePatient(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/password/reset")
+    @PreAuthorize("hasRole('PATIENT')")
+    public ResponseEntity<PasswordResetResponse> resetPassword(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody PasswordResetRequest request) {
+        return ResponseEntity.ok(patientService.resetPassword(userPrincipal.getId(), request));
     }
 
     @GetMapping("/my-appointments")

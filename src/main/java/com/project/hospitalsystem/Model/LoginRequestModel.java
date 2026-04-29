@@ -10,6 +10,9 @@ public class LoginRequestModel {
     @NotBlank(message = "Email is required")
     @Email(message = "Please provide a valid email address")
     private String email;
+    
+    @NotBlank(message = "Phone number is required")
+    private String phoneNumber;
 
     @NotBlank(message = "Password cannot be blank")
     @Size(min = 6, message = "Security Policy: Password must be at least 6 characters")

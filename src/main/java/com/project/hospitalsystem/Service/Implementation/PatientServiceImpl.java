@@ -6,10 +6,13 @@ import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Model.PatientUpdateRequest;
+import com.project.hospitalsystem.Model.PasswordResetRequest;
+import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Repo.InsuranceRepository;
 import com.project.hospitalsystem.Repo.PatientRepository;
 import com.project.hospitalsystem.Service.InsuranceService;
 import com.project.hospitalsystem.Service.PatientService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable; 
@@ -26,6 +29,7 @@ public class PatientServiceImpl implements PatientService {
     private final InsuranceRepository insuranceRepository;
     private final InsuranceService insuranceService;
     private final HospitalMapper hospitalMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -35,7 +39,8 @@ public class PatientServiceImpl implements PatientService {
         }
         return patientRepository.findByPhoneNumber(request.getPhoneNumber())
                 .map(existing -> {
-                    if (existing.getDateofbirth() != null
+                    if (existing.getDateofbirth() != null && existing.getId() != null
+                    && existing.getId().equals(existing.getId())
                             && existing.getDateofbirth().equals(request.getDateofbirth())) {
                         if (existing.isActive()) {
                             throw new RuntimeException("Error: This profile is already registered!");
@@ -78,14 +83,14 @@ public class PatientServiceImpl implements PatientService {
             insurance = insuranceRepository.findByPolicyNumber(policyNumber)
                     .orElseGet(() -> {
 
-                        // Insurance newInsurance = Insurance.builder()
-                        // .policyNumber(policyNumber)
-                        // .insuranceProvider(request.getInsurance().getInsuranceProvider())
-                        // .expiryDate(request.getInsurance().getExpiryDate())
-                        // .build();
-                        // if (newInsurance==null) {
-                        // throw new IllegalStateException("Failed to build insurance ");
-                        // }
+                        Insurance newInsurance = Insurance.builder()
+                        .policyNumber(policyNumber)
+                        .insuranceProvider(request.getInsurance().getInsuranceProvider())
+                        .expiryDate(request.getInsurance().getExpiryDate())
+                        .build();
+                        if (newInsurance==null) {
+                        throw new IllegalStateException("Failed to save insurance ");
+                        }
                         return insuranceService.manageInsurance(request.getInsurance());
                     });
         }
@@ -127,6 +132,40 @@ public class PatientServiceImpl implements PatientService {
         if (deactivatedPatient != null) {
             patientRepository.save(deactivatedPatient);
         }
+    }
+
+    @Override
+    @Transactional
+    public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
+        if (id == null) {
+            throw new IllegalArgumentException("Patient ID cannot be null");
+        }
+        if (request == null || request.getNewPassword() == null) {
+            throw new IllegalArgumentException("Password reset request is invalid");
+        }
+
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+
+        if (request.getCurrentPassword() == null) {
+            throw new IllegalArgumentException("Current password is required");
+        }
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), patient.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        Patient updatedPatient = patient.toBuilder()
+                .password(passwordEncoder.encode(request.getNewPassword()))
+                .build();
+        if(updatedPatient == null) {
+            throw new IllegalStateException("Failed to update patient password");
+        }
+        patientRepository.save(updatedPatient);
+        return PasswordResetResponse.builder()
+                .id(updatedPatient.getId())
+                .message("Patient password reset successfully")
+                .build();
     }
 
     @Override

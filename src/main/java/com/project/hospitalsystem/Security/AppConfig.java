@@ -1,4 +1,4 @@
-package com.project.hospitalsystem.Config;
+package com.project.hospitalsystem.Security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,5 +10,7 @@ public class AppConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+
+        // hashing left 
     }
 }
