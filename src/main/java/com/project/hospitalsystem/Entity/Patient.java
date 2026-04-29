@@ -51,13 +51,13 @@ public class Patient {
     private Long id;
 
     @Setter
-    @Column(nullable = false, length = 100) // Database-level constraint
+    @Column(nullable = false, length = 100)
     private String name;
 
     @Setter
     @Column(nullable = false, length = 10)
     // Not all family members may have a phone number, so we won't use "Unique
-    // property"
+    // property" , but we will ensure that only two accounts can share the same phone number.
     private String phoneNumber;
 
     @Column(nullable = false, length = 15)

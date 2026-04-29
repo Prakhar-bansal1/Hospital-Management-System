@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.project.hospitalsystem.Entity.Department;
 import com.project.hospitalsystem.Entity.Doctor;
@@ -12,6 +13,8 @@ import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.DoctorRequest;
 import com.project.hospitalsystem.Model.DoctorResponse;
 import com.project.hospitalsystem.Model.DoctorSummaryModel;
+import com.project.hospitalsystem.Model.PasswordResetRequest;
+import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Repo.DepartmentRepository;
 import com.project.hospitalsystem.Repo.DoctorRepository;
 import com.project.hospitalsystem.Service.DoctorService;
@@ -25,6 +28,7 @@ public class DoctorServiceImpl implements DoctorService {
     private final DoctorRepository doctorRepository;
     private final DepartmentRepository departmentRepository;
     private final HospitalMapper hospitalMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -59,6 +63,27 @@ public class DoctorServiceImpl implements DoctorService {
         Doctor saveDoctor = doctorRepository.save(doctor);
 
         return hospitalMapper.mapDoctorResponse(saveDoctor);
+    }
+
+    @Override
+    @Transactional
+    public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
+        if (id == null) {
+            throw new IllegalArgumentException("Doctor ID cannot be null");
+        }
+        if (request == null || request.getNewPassword() == null) {
+            throw new IllegalArgumentException("Password reset request is invalid");
+        }
+
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with ID: " + id));
+        doctor.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        doctorRepository.save(doctor);
+
+        return PasswordResetResponse.builder()
+                .id(doctor.getId())
+                .message("Doctor password reset successfully")
+                .build();
     }
 
     @Override

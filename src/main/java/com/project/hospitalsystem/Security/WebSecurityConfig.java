@@ -10,6 +10,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.project.hospitalsystem.JwtConfig.JwtAuthFilter;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -17,11 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @EnableMethodSecurity
 public class WebSecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
-    private final OAuth2SuccesslHandler oAuth2SuccesslHandler;
 
-    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter, OAuth2SuccesslHandler oAuth2SuccesslHandler) {
+    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
-        this.oAuth2SuccesslHandler = oAuth2SuccesslHandler;                             
     }
 
     @Bean
@@ -38,12 +38,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/hospital/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .oauth2Login(oAuth2 -> oAuth2.failureHandler((request, response, exception) -> {
-                    log.error("OAuth2 login failed: {}", exception.getMessage());
-                })
-                        .successHandler(oAuth2SuccesslHandler)
-            );
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
 

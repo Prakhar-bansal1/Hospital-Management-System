@@ -1,4 +1,4 @@
-package com.project.hospitalsystem.Security;
+package com.project.hospitalsystem.JwtConfig;
 
 import java.io.IOException;
 
@@ -23,26 +23,30 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
     private final UserRepository userRepository;
-    private final AuthUtil authUtil;
+    private final AuthUtil jwtService;
 
+    // Checking the header is valid or not
     @Override
-    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         final String requestTokenHeader = request.getHeader("Authorization");
-        if (requestTokenHeader == null || requestTokenHeader.startsWith("Bearer ")) {
+        // if our header is null or doesn't start with "Bearer "
+        if (requestTokenHeader == null || !requestTokenHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = requestTokenHeader.split("Bearer ")[1];
-        String userId = authUtil.getIdFromToken(token);
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findById(Long.parseLong(userId)).orElseThrow();
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                    userId, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+        String userId = jwtService.getUserIdFromToken(token);
+        if(userId != null && SecurityContextHolder.getContext().getAuthentication()== null){
+            User user= userRepository.findById(Long.parseLong(userId)).orElseThrow();
+
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
-         filterChain.doFilter(request, response);
-    }
+        filterChain.doFilter(request, response);
+    };
 
 }
