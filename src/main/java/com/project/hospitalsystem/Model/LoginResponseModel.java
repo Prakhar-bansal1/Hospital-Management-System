@@ -8,6 +8,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class LoginResponseModel {
     String JWT;
-    String refreshToken;
     Long userId;
 }

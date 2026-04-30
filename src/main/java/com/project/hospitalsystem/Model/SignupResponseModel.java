@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SignupResponseModel {
-  String JWT;
-  Long userId;
+      String JWT;
+    Long userId;
 }
