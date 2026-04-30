@@ -1,4 +1,4 @@
-package com.project.hospitalsystem.Auth.JwtConfig;
+package com.project.hospitalsystem.JwtConfig;
 
 import java.util.Date;
 
@@ -11,10 +11,9 @@ import com.project.hospitalsystem.Entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
-public class JwtUtil {
+public class AuthUtil {
 
     private static final String jwtSecretKey = "default123";
 
@@ -34,17 +33,6 @@ public class JwtUtil {
         .compact();
     }
 
-    public String generateRefreshToken(User user){
-        return Jwts.builder()
-        .subject(user.getId().toString())
-        .claim("roles", user.getRoles().stream().map(role -> role.name()).toList())
-        .signWith(getSecurityKey())
-        .issuedAt(new Date())
-        .expiration(new Date(System.currentTimeMillis() + 1000*60*60*12))//12 hours
-        .signWith(getSecurityKey())
-        .compact();
-    }
-
     public String getUserIdFromToken(String token) {
        String claims= Jwts.parser()
         .verifyWith(getSecurityKey())
@@ -54,18 +42,8 @@ public class JwtUtil {
          .getSubject();
         return claims;
     }
+   
 
-    public boolean isTokenExpired(String token) {
-        try {
-            Jwts.parser()
-                .verifyWith(getSecurityKey())
-                .build()
-                .parseSignedClaims(token);
-            return false;
-        } catch (ExpiredJwtException e) {
-            return true;
-        } catch (Exception e) {
-            return true;
-        }
-    }
+    
+
 }

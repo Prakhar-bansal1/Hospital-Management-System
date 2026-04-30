@@ -10,7 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.project.hospitalsystem.Auth.JwtConfig.JwtAuthFilter;
+import com.project.hospitalsystem.JwtConfig.JwtAuthFilter;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/sys/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/sys/patient/**").hasRole("PATIENT")
                         .requestMatchers("/hospital/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
