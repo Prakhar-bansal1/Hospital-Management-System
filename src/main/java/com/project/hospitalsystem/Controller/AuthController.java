@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.project.hospitalsystem.JwtConfig.AuthService;
+import com.project.hospitalsystem.Auth.AuthService;
 import com.project.hospitalsystem.Model.LoginRequestModel;
 import com.project.hospitalsystem.Model.LoginResponseModel;
 import com.project.hospitalsystem.Model.SignupRequestModel;
@@ -24,10 +24,9 @@ public class AuthController {
     public ResponseEntity<LoginResponseModel> login(@RequestBody LoginRequestModel loginRequestModel) {
         return ResponseEntity.ok(authService.login(loginRequestModel));
     }
-    @PostMapping("/register")
-    public ResponseEntity<SignupResponseModel> register(@RequestBody SignupRequestModel signupRequestModel){
-        return ResponseEntity.ok(authService.register(signupRequestModel));
 
+    @PostMapping("/register")
+    public ResponseEntity<SignupResponseModel> register(@RequestBody SignupRequestModel signupRequestModel) {
+        return ResponseEntity.ok(authService.register(signupRequestModel));
     }
-    
 }
