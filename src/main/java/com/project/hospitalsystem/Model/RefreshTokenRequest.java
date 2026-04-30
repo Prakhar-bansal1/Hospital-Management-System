@@ -3,11 +3,10 @@ package com.project.hospitalsystem.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class LoginResponseModel {
-    String JWT;
-    String refreshToken;
-    Long userId;
+public class RefreshTokenRequest {
+    private String refreshToken;
 }

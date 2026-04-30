@@ -1,10 +1,15 @@
-package com.project.hospitalsystem.JwtConfig;
+package com.project.hospitalsystem.Auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.lang.NonNull;
 
+import com.project.hospitalsystem.Auth.JwtConfig.JwtUtil;
+import com.project.hospitalsystem.Auth.JwtConfig.RefreshToken.RefreshToken;
+import com.project.hospitalsystem.Auth.JwtConfig.RefreshToken.RefreshTokenRepository;
+import com.project.hospitalsystem.Auth.JwtConfig.RefreshToken.RefreshTokenService;
 import com.project.hospitalsystem.Entity.User;
 import com.project.hospitalsystem.Model.LoginRequestModel;
 import com.project.hospitalsystem.Model.LoginResponseModel;
@@ -18,8 +23,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthService {
     private final AuthenticationManager authenticationManager;
-    private final AuthUtil jwtService;
+    private final JwtUtil jwtService;
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public LoginResponseModel login(LoginRequestModel loginRequestModel) {
 
@@ -27,7 +34,8 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(loginRequestModel.getEmail(), loginRequestModel.getPassword()));
         User user = (User) authentication.getPrincipal();
         String token = jwtService.generateAccessToken(user);
-        return new LoginResponseModel(token, user.getId());
+        RefreshToken refreshToken = refreshTokenService.getOrCreateRefreshToken(user);
+        return new LoginResponseModel(token, refreshToken.getRefreshToken(), user.getId());
     }
 
     public SignupResponseModel register(SignupRequestModel signupRequestModel) {
@@ -47,5 +55,15 @@ public class AuthService {
         }
        userRepository.save(newUser);
        return new SignupResponseModel("User registered successfully", newUser.getId());
+    }
+
+    public LoginResponseModel refreshToken(@NonNull String refreshTokenString) {
+        RefreshToken refreshToken = refreshTokenService.verifyAndRefreshToken(refreshTokenString);
+        User user = refreshToken.getUser();
+        String newAccessToken = jwtService.generateAccessToken(user);
+        RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+        refreshTokenRepository.delete(refreshToken);
+        
+        return new LoginResponseModel(newAccessToken, newRefreshToken.getRefreshToken(), user.getId());
     }
 }

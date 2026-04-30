@@ -116,7 +116,6 @@ public class ReceptionServiceImpl implements ReceptionService {
 				.email(saved.getEmail())
 				.phoneNumber(saved.getPhoneNumber())
 				.role(Role.RECEPTION.name())
-				.message("Receptionist created successfully")
 				.build();
 	}
 
