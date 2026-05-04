@@ -603,29 +603,9 @@ docker run -p 8080:8080 -e DATABASE_URL=jdbc:mysql://db:3306/hospitalsystem hosp
 
 ---
 
-## 📞 Support & Contact
-
-For issues, questions, or contributions:
-- 📧 Email: support@hospitalsystem.com
-- 🐛 Report bugs on GitHub Issues
-- 💡 Submit feature requests
-- 🤝 Contribute via Pull Requests
-
----
-
 ## 📜 License
 
 This project is licensed under the MIT License - see LICENSE file for details.
-
----
-
-## 🎓 Learning Resources
-
-- [Spring Boot Official Documentation](https://spring.io/projects/spring-boot)
-- [Spring Security Documentation](https://spring.io/projects/spring-security)
-- [JWT.io Introduction](https://jwt.io/introduction)
-- [Hibernate ORM Guide](https://hibernate.org/orm/)
-- [RESTful API Best Practices](https://restfulapi.net/)
 
 ---
 
