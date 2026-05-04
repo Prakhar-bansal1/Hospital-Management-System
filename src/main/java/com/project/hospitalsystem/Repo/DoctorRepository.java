@@ -9,7 +9,6 @@ import com.project.hospitalsystem.Entity.Doctor;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
-    // boolean check -> is data unique?
     boolean existsByLicenseNumber(String licenseNumber);
 
     boolean existsByEmail(String email);

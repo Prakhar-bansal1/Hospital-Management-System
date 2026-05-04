@@ -2,6 +2,8 @@ package com.project.hospitalsystem.Service.Implementation;
 
 import com.project.hospitalsystem.Entity.Insurance;
 import com.project.hospitalsystem.Entity.Patient;
+import com.project.hospitalsystem.Exception.BaseException;
+import com.project.hospitalsystem.Exception.ErrorCode;
 import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
@@ -35,7 +37,7 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public PatientResponse registerPatient(PatientRequest request) {
         if (request == null || request.getPhoneNumber() == null || request.getDateofbirth() == null) {
-            throw new RuntimeException("Invalid data provided");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient request must contain phone number and date of birth");
         }
         return patientRepository.findByPhoneNumber(request.getPhoneNumber())
                 .map(existing -> {
@@ -43,7 +45,7 @@ public class PatientServiceImpl implements PatientService {
                     && existing.getId().equals(existing.getId())
                             && existing.getDateofbirth().equals(request.getDateofbirth())) {
                         if (existing.isActive()) {
-                            throw new RuntimeException("Error: This profile is already registered!");
+                            throw new BaseException(ErrorCode.PATIENT_ALREADY_REGISTERED, "Patient with this phone number is already registered");
                         }
                         return reactivateExistingPatient(existing, request);
                     } else {
@@ -70,7 +72,7 @@ public class PatientServiceImpl implements PatientService {
                 .build();
 
         if (reactivated == null) {
-            throw new IllegalStateException("Failed to reactivate patient");
+            throw new BaseException(ErrorCode.PATIENT_REACTIVATION_FAILED, "Error occurred while building reactivated patient record");
         }
         patientRepository.save(reactivated);
         return hospitalMapper.mapPatientResponse(reactivated);
@@ -89,7 +91,7 @@ public class PatientServiceImpl implements PatientService {
                         .expiryDate(request.getInsurance().getExpiryDate())
                         .build();
                         if (newInsurance==null) {
-                        throw new IllegalStateException("Failed to save insurance ");
+                        throw new BaseException(ErrorCode.INSURANCE_SAVE_FAILED, "Failed to save insurance for patient");
                         }
                         return insuranceService.manageInsurance(request.getInsurance());
                     });
@@ -110,7 +112,7 @@ public class PatientServiceImpl implements PatientService {
                 .build();
 
         if (newPatient == null) {
-            throw new IllegalStateException("Failed to build Patient");
+            throw new BaseException(ErrorCode.PATIENT_BUILD_FAILED, "Error occurred while building patient record");
         }
         Patient saved = patientRepository.save(newPatient);
         return hospitalMapper.mapPatientResponse(saved);
@@ -120,11 +122,11 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public void deactivatePatient(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("Patient ID cannot be null");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
         }
 
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient record not found "));
+                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
         Patient deactivatedPatient = patient.toBuilder()
                 .active(false)
                 .build();
@@ -138,28 +140,28 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
         if (id == null) {
-            throw new IllegalArgumentException("Patient ID cannot be null");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
         }
         if (request == null || request.getNewPassword() == null) {
-            throw new IllegalArgumentException("Password reset request is invalid");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request with new password is required");
         }
 
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
 
         if (request.getCurrentPassword() == null) {
-            throw new IllegalArgumentException("Current password is required");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is required for verification");
         }
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), patient.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is incorrect");
         }
 
         Patient updatedPatient = patient.toBuilder()
                 .password(passwordEncoder.encode(request.getNewPassword()))
                 .build();
         if(updatedPatient == null) {
-            throw new IllegalStateException("Failed to update patient password");
+            throw new BaseException(ErrorCode.OPERATION_FAILED, "Failed to update patient password");
         }
         patientRepository.save(updatedPatient);
         return PasswordResetResponse.builder()
@@ -172,13 +174,13 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public PatientResponse updatePatient(Long id, PatientUpdateRequest request) {
         if (id == null) {
-            throw new IllegalArgumentException("Patient ID cannot be null");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
         }
         Patient existingPatient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
         hospitalMapper.updatePatientFromRequest(request, existingPatient);
         if (existingPatient == null) {
-            throw new IllegalArgumentException("Patient ID cannot be null");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
         }
         Patient savedPatient = patientRepository.save(existingPatient);
         return hospitalMapper.mapPatientResponse(savedPatient);
@@ -187,17 +189,17 @@ public class PatientServiceImpl implements PatientService {
     @Override
     public PatientResponse getPatientById(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("Patient ID cannot be null");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
         }
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + id));
+                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
         return hospitalMapper.mapPatientResponse(patient);
     }
 
     @Override
     public Slice<PatientResponse> getAllPatients(Pageable pageable) {
         if (pageable == null) {
-        throw new IllegalArgumentException("Pagination information (Pageable) cannot be null");
+        throw new BaseException(ErrorCode.INVALID_INPUT, "Pagination information (Pageable) cannot be null");
     }
        return patientRepository.findAll(pageable)
                 .map(hospitalMapper::mapPatientResponse);

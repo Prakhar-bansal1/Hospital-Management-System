@@ -3,6 +3,8 @@ package com.project.hospitalsystem.Service.Implementation;
 import org.springframework.stereotype.Service;
 
 import com.project.hospitalsystem.Entity.Insurance;
+import com.project.hospitalsystem.Exception.BaseException;
+import com.project.hospitalsystem.Exception.ErrorCode;
 import com.project.hospitalsystem.Model.InsuranceRequest;
 import com.project.hospitalsystem.Repo.InsuranceRepository;
 import com.project.hospitalsystem.Service.InsuranceService;
@@ -20,7 +22,7 @@ public class InsuranceServiceImpl implements InsuranceService {
     @Transactional
     public Insurance manageInsurance(InsuranceRequest request) {
         if (request == null || request.getPolicyNumber() == null) {
-            throw new IllegalArgumentException("Insurance Policy number is required!");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Insurance Policy number is required.");
         }
         return insuranceRepository.findByPolicyNumber(request.getPolicyNumber())
                 .orElseGet(() -> {
@@ -31,7 +33,7 @@ public class InsuranceServiceImpl implements InsuranceService {
                             .build();
 
                     if (createInsurance == null) {
-                        throw new IllegalStateException("Failed to create new insurance!");
+                        throw new BaseException(ErrorCode.INSURANCE_CREATE_FAILED, "Failed to create new insurance.");
                     }
                     return insuranceRepository.save(createInsurance);
 
@@ -42,7 +44,7 @@ public class InsuranceServiceImpl implements InsuranceService {
     @Override
     public Insurance getInsuranceByPolicyNumber(String policyNumber) {
         return insuranceRepository.findByPolicyNumber(policyNumber)
-                .orElseThrow(() -> new RuntimeException("Insurance not found with policy number: " + policyNumber));
+                .orElseThrow(() -> new BaseException(ErrorCode.INSURANCE_NOT_FOUND, "Insurance not found with policy number: " + policyNumber));
     }
 
 }

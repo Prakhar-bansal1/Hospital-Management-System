@@ -5,12 +5,13 @@ import java.time.LocalTime;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import com.project.hospitalsystem.Entity.Appointment;
 import com.project.hospitalsystem.Entity.Doctor;
 import com.project.hospitalsystem.Entity.Patient;
+import com.project.hospitalsystem.Exception.BaseException;
+import com.project.hospitalsystem.Exception.ErrorCode;
 import com.project.hospitalsystem.Mapper.AppointmentMapper;
 import com.project.hospitalsystem.Model.AppointmentRequest;
 import com.project.hospitalsystem.Model.AppointmentResponse;
@@ -41,36 +42,34 @@ public class AppointmentServiceImpl implements AppointmentService {
         // No booking at current time and past time
         if (date.isBefore(LocalDate.now()) ||
                 (date.isEqual(LocalDate.now()) && time.isBefore(LocalTime.now()))) {
-            throw new IllegalArgumentException("Cannot book an appointment in the past!");
+            throw new BaseException(ErrorCode.APPOINTMENT_INVALID_TIME, "Cannot book an appointment in the past.");
         }
 
         // Hospital Hours & 30-Min Format (9-5) with 30 mins booking slots
         if (time.getMinute() % 30 != 0 || time.getHour() < 9 || time.getHour() >= 17) {
-            throw new IllegalArgumentException(
-                    "Invalid slot! Please select slots like 09:30, 10:00 etc. between 09:00 and 17:00.");
+            throw new BaseException(ErrorCode.APPOINTMENT_INVALID_SLOT, "Invalid slot! Please select slots like 09:30, 10:00 etc. between 09:00 and 17:00.");
         }
 
         // 10-Patient Limit per slot
         long currentBookings = appointmentRepository.countActiveAppointments(request.getDoctorId(), date, time);
         if (currentBookings >= 10) {
-            throw new IllegalStateException(
-                    "This time slot ( " + time + " ) is fully booked Please choose another time.");
+            throw new BaseException(ErrorCode.APPOINTMENT_SLOT_FULL, "This time slot (" + time + ") is fully booked. Please choose another time.");
         }
 
         if (request.getPatientId() == null || request.getDoctorId() == null) {
-            throw new IllegalArgumentException("Patient and Doctor ID's must be provided!");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient and Doctor ID's must be provided.");
         }
 
         Long patId = request.getPatientId();
         Long docId = request.getDoctorId();
         if (patId == null || docId == null) {
-            throw new IllegalArgumentException("Patient and Doctor IDs must be provided!");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient and Doctor IDs must be provided.");
         }
         Patient patient = patientRepository.findById(patId)
-                .orElseThrow(() -> new RuntimeException("Patient not found"));
+                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient not found."));
 
         Doctor doctor = doctorRepository.findById(docId)
-                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+                .orElseThrow(() -> new BaseException(ErrorCode.DOCTOR_NOT_FOUND, "Doctor not found."));
 
         Appointment appointment = Appointment.builder()
                 .appointmentDate(request.getAppointmentDate())
@@ -79,7 +78,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .doctor(doctor)
                 .build();
         if (appointment == null) {
-            throw new IllegalStateException("Failed to create appointment");
+            throw new BaseException(ErrorCode.APPOINTMENT_CREATE_FAILED, "Failed to create appointment.");
         }
         Appointment save = appointmentRepository.save(appointment);
         return appointmentMapper.mapAppointmentResponse(save);
@@ -88,10 +87,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentResponse getAppointmentById(Long id) {
         if (id == null) {
-            throw new IllegalArgumentException("Appointment ID must be provided!");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Appointment ID must be provided.");
         }
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new BaseException(ErrorCode.APPOINTMENT_NOT_FOUND, "Appointment not found."));
         return appointmentMapper.mapAppointmentResponse(appointment);
     }
 
@@ -99,18 +98,18 @@ public class AppointmentServiceImpl implements AppointmentService {
 @Transactional
 public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateRequest, Long authenticatedDoctorId) {
     if (id == null) {
-        throw new IllegalArgumentException("Appointment ID must be provided!");
+        throw new BaseException(ErrorCode.INVALID_INPUT, "Appointment ID must be provided.");
     }
     Appointment appointment = appointmentRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Appointment not found"));
+            .orElseThrow(() -> new BaseException(ErrorCode.APPOINTMENT_NOT_FOUND, "Appointment not found."));
     if (!appointment.getDoctor().getId().equals(authenticatedDoctorId)) {
-        throw new AccessDeniedException("Security Alert: Unauthorized update attempt detected!");
+        throw new BaseException(ErrorCode.UNAUTHORIZED_ACCESS, "Unauthorized access to this resource.");
     }
         Appointment update = appointment.toBuilder()
                 .status(updateRequest.getStatus())
                 .build();
         if (update == null) {
-            throw new IllegalStateException("Failed to create appointment");
+            throw new BaseException(ErrorCode.APPOINTMENT_CREATE_FAILED, "Failed to update appointment.");
         }
 
         return appointmentMapper.mapAppointmentResponse(appointmentRepository.save(update));
@@ -121,7 +120,7 @@ public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateR
     @Override
     public Slice<AppointmentResponse> getAppointmentsByPatient(Long patientId, Pageable pageable) {
         if (patientId == null) {
-            throw new IllegalArgumentException("Patient Id required!");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID is required.");
         }
         return appointmentRepository.findByPatient_Id(patientId, pageable)
                 .map(appointmentMapper::mapAppointmentResponse);
@@ -130,7 +129,7 @@ public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateR
     @Override
     public Slice<AppointmentResponse> getAppointmentsByDoctor(Long doctorId, Pageable pageable) {
         if (doctorId == null) {
-            throw new IllegalArgumentException("Doctor Id required");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "Doctor ID is required.");
         }
         return appointmentRepository.findByDoctor_IdAndAppointmentDate(doctorId, LocalDate.now(), pageable)
                 .map(appointmentMapper::mapAppointmentResponse);
@@ -139,10 +138,10 @@ public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateR
     @Override
     public Slice<AppointmentResponse> getAppointmentsByPatientUser(Long userId, Pageable pageable) {
         if (userId == null) {
-            throw new IllegalArgumentException("User Id required");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "User ID is required.");
         }
         Patient patient = patientRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Patient profile not found for this user"));
+                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient profile not found for this user."));
         return appointmentRepository.findByPatient_Id(patient.getId(), pageable)
                 .map(appointmentMapper::mapAppointmentResponse);
     }
@@ -150,10 +149,10 @@ public AppointmentResponse updateStatus(Long id, AppointmentStatusUpdate updateR
     @Override
     public Slice<AppointmentResponse> getAppointmentsByDoctorUser(Long userId, Pageable pageable) {
         if (userId == null) {
-            throw new IllegalArgumentException("User Id required");
+            throw new BaseException(ErrorCode.INVALID_INPUT, "User ID is required.");
         }
         Doctor doctor = doctorRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Doctor profile not found for this user"));
+                .orElseThrow(() -> new BaseException(ErrorCode.DOCTOR_NOT_FOUND, "Doctor profile not found for this user."));
 
         // 2. Fetch schedule (usually for current date/future)
         return appointmentRepository

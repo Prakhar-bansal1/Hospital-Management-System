@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.hospitalsystem.Entity.Role;
 import com.project.hospitalsystem.Entity.User;
+import com.project.hospitalsystem.Exception.BaseException;
+import com.project.hospitalsystem.Exception.ErrorCode;
 import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Service.ReceptionService;
 import com.project.hospitalsystem.Model.AppointmentRequest;
@@ -53,14 +55,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 	}
 
 	public PatientResponse findPatientByPhone(String phone) {
-		if (phone == null) throw new IllegalArgumentException("Phone number required");
+		if (phone == null) throw new BaseException(ErrorCode.INVALID_INPUT, "Phone number is required.");
 		return patientRepository.findByPhoneNumber(phone)
 				.map(hospitalMapper::mapPatientResponse)
-				.orElseThrow(() -> new RuntimeException("Patient not found with phone: " + phone));
+				.orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient not found with phone: " + phone));
 	}
 
 	public Slice<PatientResponse> findPatientsByName(String name, Pageable pageable) {
-		if (name == null) throw new IllegalArgumentException("Name is required");
+		if (name == null) throw new BaseException(ErrorCode.INVALID_INPUT, "Patient name is required.");
 		return patientRepository.findByNameStartingWithIgnoreCase(name, pageable)
 				.map(hospitalMapper::mapPatientResponse);
 	}
@@ -92,14 +94,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Transactional
 	public ReceptionResponse registerReceptionist(ReceptionRequest request) {
 		if (request == null) {
-			throw new IllegalArgumentException("Receptionist request cannot be null");
+			throw new BaseException(ErrorCode.RECEPTIONIST_NULL_REQUEST, "Receptionist request cannot be null.");
 		}
 		if (request.getPhoneNumber() == null || request.getEmail() == null || request.getPassword() == null) {
-			throw new IllegalArgumentException("Receptionist name, email, phone number, and password are required");
+			throw new BaseException(ErrorCode.INVALID_INPUT, "Receptionist name, email, phone number, and password are required.");
 		}
 		Optional<User> existingByPhone = userRepository.findByPhoneNumber(request.getPhoneNumber());
 		if (existingByPhone.isPresent()) {
-			throw new IllegalStateException("User with this phone number already exists");
+			throw new BaseException(ErrorCode.RECEPTIONIST_PHONE_EXISTS, "User with this phone number already exists.");
 		}
 		User receptionist = User.builder()
 				.name(request.getName())
@@ -124,10 +126,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Transactional
 	public void deactivateReceptionist(Long id) {
 		if (id == null) {
-			throw new IllegalArgumentException("Receptionist ID cannot be null");
+			throw new BaseException(ErrorCode.INVALID_INPUT, "Receptionist ID cannot be null.");
 		}
 		User receptionist = userRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Receptionist not found with ID: " + id));
+				.orElseThrow(() -> new BaseException(ErrorCode.RECEPTIONIST_NOT_FOUND, "Receptionist not found with ID: " + id));
 		receptionist.setActive(false);
 		userRepository.save(receptionist);
 	}
@@ -136,14 +138,14 @@ public class ReceptionServiceImpl implements ReceptionService {
 	@Transactional
 	public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
 		if (id == null) {
-			throw new IllegalArgumentException("Receptionist ID cannot be null");
+			throw new BaseException(ErrorCode.INVALID_INPUT, "Receptionist ID cannot be null.");
 		}
 		if (request == null || request.getNewPassword() == null) {
-			throw new IllegalArgumentException("Password reset request is invalid");
+			throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request is invalid.");
 		}
 
 		User receptionist = userRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Receptionist not found with ID: " + id));
+				.orElseThrow(() -> new BaseException(ErrorCode.RECEPTIONIST_NOT_FOUND, "Receptionist not found with ID: " + id));
 		receptionist.setPassword(passwordEncoder.encode(request.getNewPassword()));
 		userRepository.save(receptionist);
 
