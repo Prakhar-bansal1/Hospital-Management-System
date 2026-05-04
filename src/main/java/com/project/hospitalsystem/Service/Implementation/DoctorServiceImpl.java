@@ -74,6 +74,7 @@ public class DoctorServiceImpl implements DoctorService {
                 .email(request.getEmail())
                 .qualification(request.getQualification())
                 .consultationFee(request.getConsultationFee())
+            .password(passwordEncoder.encode(request.getPassword()))
                 .department(department)
                 .build();
         if (doctor.getEmail() == null || doctor.getLicenseNumber() == null) {

@@ -3,6 +3,7 @@ package com.project.hospitalsystem.JwtConfig;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.project.hospitalsystem.Entity.User;
@@ -20,6 +21,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final AuthUtil jwtService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public LoginResponseModel login(LoginRequestModel loginRequestModel) {
 
@@ -39,7 +41,7 @@ public class AuthService {
         User newUser = User.builder()
         .name(signupRequestModel.getName())
         .email(signupRequestModel.getEmail())
-        .password(signupRequestModel.getPassword())
+        .password(passwordEncoder.encode(signupRequestModel.getPassword()))
         .phoneNumber(signupRequestModel.getPhoneNumber())
         .build();
         if(newUser==null){

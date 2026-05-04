@@ -102,6 +102,7 @@ public class PatientServiceImpl implements PatientService {
                 .dateofbirth(request.getDateofbirth())
                 .phoneNumber(request.getPhoneNumber())
                 .email(request.getEmail())
+            .password(passwordEncoder.encode(request.getPassword()))
                 .bloodGroup(request.getBloodGroup())
                 .fullAddress(request.getFullAddress())
                 .city(request.getCity())
