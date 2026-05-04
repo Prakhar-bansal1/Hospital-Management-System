@@ -17,7 +17,7 @@ A comprehensive RESTful API-based Hospital Management System built with Java Spr
 - **🏢 Department Management**: Create and manage hospital departments
 - **💳 Insurance Management**: Patient insurance policy tracking with expiry validation
 - **👤 Role-Based Access Control**: 4 distinct roles (Admin, Doctor, Patient, Reception)
-- **🔐 Security**: JWT token-based authentication, BCrypt password hashing, input validation
+- **🔐 Security**: JWT token-based authentication, Argon2id password hashing, input validation
 
 ### Security Features
 - JWT token-based authentication (10-minute expiration)
@@ -39,7 +39,7 @@ A comprehensive RESTful API-based Hospital Management System built with Java Spr
 | **Security** | Spring Security, JWT (JJWT 0.12.5) |
 | **Database** | JPA/Hibernate, MySQL 8.0+ |
 | **Build Tool** | Maven 3.6+ |
-| **Password Encoding** | BCrypt |
+| **Password Encoding** | Argon2id (Spring Security Argon2PasswordEncoder) |
 | **Logging** | SLF4J/Logback |
 | **Utilities** | Lombok, Jackson |
 
@@ -141,7 +141,7 @@ hospitalsystem/
 - name
 - email (UNIQUE)
 - phoneNumber
-- password (BCrypt hashed)
+- password (Argon2id hashed)
 - roles (ElementCollection with @Enumerated)
 - isActive (boolean)
 - createdAt
@@ -504,7 +504,7 @@ curl -X GET http://localhost:8080/hospital/doctors \
 ## 🔒 Security Best Practices
 
 ### Current Implementation
-✅ BCrypt password hashing with strength 12  
+✅ Argon2id password hashing (Spring Security Argon2PasswordEncoder)  
 ✅ JWT token-based stateless authentication  
 ✅ Role-based method-level authorization  
 ✅ Input validation with regex patterns  
