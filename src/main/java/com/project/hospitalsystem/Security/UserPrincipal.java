@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 
-@Getter
+@Getter 
 public class UserPrincipal implements UserDetails {
     private final Long id;
     private final String email;
