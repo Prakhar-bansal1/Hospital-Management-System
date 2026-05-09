@@ -50,7 +50,7 @@ public class Patient {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String userId;
 
     @Setter

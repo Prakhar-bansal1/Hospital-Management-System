@@ -1,4 +1,4 @@
-# 🏥 Hospital Management System
+<!-- # 🏥 Hospital Management System
 
 A comprehensive RESTful API-based Hospital Management System built with Java Spring Boot for managing patients, doctors, appointments, departments, and insurance policies. Features role-based access control (RBAC), JWT authentication, and sophisticated appointment slot management.
 
@@ -634,4 +634,4 @@ mvn dependency:tree
 
 # Generate JavaDoc
 mvn javadoc:javadoc
-```
+``` -->
