@@ -38,19 +38,21 @@ public enum ErrorCode {
 
     // Receptionist Errors
     RECEPTIONIST_NOT_FOUND("ERR_022", "Receptionist not found."),
-    RECEPTIONIST_PHONE_EXISTS("ERR_023", "User with this phone number already exists."),
-    RECEPTIONIST_NULL_REQUEST("ERR_024", "Receptionist request cannot be null."),
+    RECEPTIONIST_PHONE_EXISTS("ERR_023", "Receptionist with this phone number already exists."),
+    RECEPTIONIST_EMAIL_EXISTS("ERR_024", "Receptionist with this email already exists."),
+    RECEPTIONIST_NULL_REQUEST("ERR_025", "Receptionist request cannot be null."),
 
     // Authorization Errors
-    UNAUTHORIZED_ACCESS("ERR_025", "Unauthorized access to this resource."),
+    UNAUTHORIZED_ACCESS("ERR_026", "Unauthorized access to this resource."),
 
     // Generic Errors
-    INVALID_INPUT("ERR_026", "Invalid input provided."),
-    OPERATION_FAILED("ERR_027", "Operation failed.");
+    INVALID_INPUT("ERR_027", "Invalid input provided."),
+    OPERATION_FAILED("ERR_028", "Operation failed.");
 
     private final String code;
     private final String message;
 
+    // const..
     // const..
     ErrorCode(String code, String message) {
         this.code = code;

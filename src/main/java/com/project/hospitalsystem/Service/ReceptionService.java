@@ -8,8 +8,6 @@ import com.project.hospitalsystem.Model.AppointmentResponse;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Model.PatientUpdateRequest;
-import com.project.hospitalsystem.Model.PasswordResetRequest;
-import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Model.ReceptionRequest;
 import com.project.hospitalsystem.Model.ReceptionResponse;
 
@@ -35,7 +33,6 @@ public interface ReceptionService {
 
     ReceptionResponse registerReceptionist(ReceptionRequest request);
 
-    PasswordResetResponse resetPassword(Long id, PasswordResetRequest request);
 
     void deactivateReceptionist(Long id);
 

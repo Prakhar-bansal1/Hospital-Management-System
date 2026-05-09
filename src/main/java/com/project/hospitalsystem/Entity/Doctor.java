@@ -46,6 +46,7 @@ public class Doctor {
     private String name;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
     private GenderType gender;
 
     @Column(nullable = false, length = 100)

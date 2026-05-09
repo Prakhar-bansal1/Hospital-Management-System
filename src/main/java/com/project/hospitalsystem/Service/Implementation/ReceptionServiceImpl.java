@@ -5,8 +5,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.hospitalsystem.Entity.Receptionist;
 import com.project.hospitalsystem.Entity.Role;
-import com.project.hospitalsystem.Entity.User;
 import com.project.hospitalsystem.Exception.BaseException;
 import com.project.hospitalsystem.Exception.ErrorCode;
 import com.project.hospitalsystem.Mapper.HospitalMapper;
@@ -16,18 +16,16 @@ import com.project.hospitalsystem.Model.AppointmentResponse;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Model.PatientUpdateRequest;
-import com.project.hospitalsystem.Model.PasswordResetRequest;
-import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Model.ReceptionRequest;
 import com.project.hospitalsystem.Model.ReceptionResponse;
 import com.project.hospitalsystem.Repo.PatientRepository;
-import com.project.hospitalsystem.Repo.UserRepository;
+import com.project.hospitalsystem.Repo.ReceptionistRepository;
 import com.project.hospitalsystem.Service.AppointmentService;
 import com.project.hospitalsystem.Service.PatientService;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Objects;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -42,7 +40,7 @@ public class ReceptionServiceImpl implements ReceptionService {
 	private final AppointmentService appointmentService;
 	private final PatientRepository patientRepository;
 	private final HospitalMapper hospitalMapper;
-	private final UserRepository userRepository;
+	private final ReceptionistRepository receptionistRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
@@ -99,27 +97,23 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (request.getPhoneNumber() == null || request.getEmail() == null || request.getPassword() == null) {
 			throw new BaseException(ErrorCode.INVALID_INPUT, "Receptionist name, email, phone number, and password are required.");
 		}
-		Optional<User> existingByPhone = userRepository.findByPhoneNumber(request.getPhoneNumber());
+		Optional<Receptionist> existingByPhone = receptionistRepository.findByPhoneNumber(request.getPhoneNumber());
 		if (existingByPhone.isPresent()) {
-			throw new BaseException(ErrorCode.RECEPTIONIST_PHONE_EXISTS, "User with this phone number already exists.");
+			throw new BaseException(ErrorCode.RECEPTIONIST_PHONE_EXISTS, "Receptionist with this phone number already exists.");
 		}
-		User receptionist = User.builder()
+		if (receptionistRepository.existsByEmail(request.getEmail())) {
+			throw new BaseException(ErrorCode.RECEPTIONIST_EMAIL_EXISTS, "Receptionist with this email already exists.");
+		}
+		Receptionist receptionist = Receptionist.builder()
 				.name(request.getName())
 				.email(request.getEmail())
 				.phoneNumber(request.getPhoneNumber())
 				.password(passwordEncoder.encode(request.getPassword()))
 				.roles(Set.of(Role.RECEPTION))
-				.isActive(true)
+				.active(true)
 				.build();
-		User saved = userRepository.save(Objects.requireNonNull(receptionist));
-		return ReceptionResponse.builder()
-				.id(saved.getId())
-				.name(saved.getName())
-				.email(saved.getEmail())
-				.phoneNumber(saved.getPhoneNumber())
-				.role(Role.RECEPTION.name())
-				.message("Receptionist created successfully")
-				.build();
+		Receptionist saved = receptionistRepository.save(Objects.requireNonNull(receptionist));
+		return hospitalMapper.mapReceptionistResponse(saved, "Receptionist created successfully");
 	}
 
 	@Override
@@ -128,31 +122,10 @@ public class ReceptionServiceImpl implements ReceptionService {
 		if (id == null) {
 			throw new BaseException(ErrorCode.INVALID_INPUT, "Receptionist ID cannot be null.");
 		}
-		User receptionist = userRepository.findById(id)
+		Receptionist receptionist = receptionistRepository.findById(id)
 				.orElseThrow(() -> new BaseException(ErrorCode.RECEPTIONIST_NOT_FOUND, "Receptionist not found with ID: " + id));
 		receptionist.setActive(false);
-		userRepository.save(receptionist);
+		receptionistRepository.save(receptionist);
 	}
 
-	@Override
-	@Transactional
-	public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
-		if (id == null) {
-			throw new BaseException(ErrorCode.INVALID_INPUT, "Receptionist ID cannot be null.");
-		}
-		if (request == null || request.getNewPassword() == null) {
-			throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request is invalid.");
-		}
-
-		User receptionist = userRepository.findById(id)
-				.orElseThrow(() -> new BaseException(ErrorCode.RECEPTIONIST_NOT_FOUND, "Receptionist not found with ID: " + id));
-		receptionist.setPassword(passwordEncoder.encode(request.getNewPassword()));
-		userRepository.save(receptionist);
-
-		return PasswordResetResponse.builder()
-				.id(receptionist.getId())
-				.message("Receptionist password reset successfully")
-				.build();
-	}
-
-}
+ }

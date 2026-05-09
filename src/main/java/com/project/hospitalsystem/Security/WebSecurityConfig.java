@@ -8,21 +8,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.project.hospitalsystem.JwtConfig.JwtAuthFilter;
-
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Configuration
 @EnableMethodSecurity
 public class WebSecurityConfig {
-    private final JwtAuthFilter jwtAuthFilter;
-
-    public WebSecurityConfig(JwtAuthFilter jwtAuthFilter) {
-        this.jwtAuthFilter = jwtAuthFilter;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -36,9 +25,8 @@ public class WebSecurityConfig {
                         .requestMatchers("/sys/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/sys/patient/**").hasRole("PATIENT")
                         .requestMatchers("/hospital/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
-                        .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .anyRequest().authenticated());
         return httpSecurity.build();
     }
 

@@ -7,10 +7,12 @@ import org.springframework.validation.annotation.Validated;
 
 import com.project.hospitalsystem.Entity.Doctor;
 import com.project.hospitalsystem.Entity.Patient;
+import com.project.hospitalsystem.Entity.Receptionist;
 import com.project.hospitalsystem.Model.DoctorResponse;
 import com.project.hospitalsystem.Model.DoctorSummaryModel;
 import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Model.PatientUpdateRequest;
+import com.project.hospitalsystem.Model.ReceptionResponse;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -94,5 +96,18 @@ public class HospitalMapper {
         patient.setFullAddress(request.getFullAddress());
         patient.setCity(request.getCity());
         patient.setPincode(request.getPincode());
+    }
+
+    public ReceptionResponse mapReceptionistResponse(Receptionist receptionist, String message) {
+        if (receptionist == null) {
+            throw new IllegalArgumentException("Receptionist cannot be null");
+        }
+        return ReceptionResponse.builder()
+                .id(receptionist.getId())
+                .name(receptionist.getName())
+                .email(receptionist.getEmail())
+                .phoneNumber(receptionist.getPhoneNumber())
+                .role("RECEPTION")
+                .build();
     }
 }

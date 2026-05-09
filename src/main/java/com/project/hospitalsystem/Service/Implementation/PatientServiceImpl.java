@@ -8,8 +8,6 @@ import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.PatientRequest;
 import com.project.hospitalsystem.Model.PatientResponse;
 import com.project.hospitalsystem.Model.PatientUpdateRequest;
-import com.project.hospitalsystem.Model.PasswordResetRequest;
-import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Repo.InsuranceRepository;
 import com.project.hospitalsystem.Repo.PatientRepository;
 import com.project.hospitalsystem.Service.InsuranceService;
@@ -137,39 +135,73 @@ public class PatientServiceImpl implements PatientService {
         }
     }
 
-    @Override
-    @Transactional
-    public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
-        if (id == null) {
-            throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
-        }
-        if (request == null || request.getNewPassword() == null) {
-            throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request with new password is required");
-        }
+    // @Override
+    // @Transactional
+    // public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
+    //     if (id == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
+    //     }
+    //     if (request == null || request.getNewPassword() == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request with new password is required");
+    //     }
 
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
+    //     Patient patient = patientRepository.findById(id)
+    //             .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
 
-        if (request.getCurrentPassword() == null) {
-            throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is required for verification");
-        }
+    //     if (request.getCurrentPassword() == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is required for verification");
+    //     }
 
-        if (!passwordEncoder.matches(request.getCurrentPassword(), patient.getPassword())) {
-            throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is incorrect");
-        }
+    //     if (!passwordEncoder.matches(request.getCurrentPassword(), patient.getPassword())) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is incorrect");
+    //     }
 
-        Patient updatedPatient = patient.toBuilder()
-                .password(passwordEncoder.encode(request.getNewPassword()))
-                .build();
-        if(updatedPatient == null) {
-            throw new BaseException(ErrorCode.OPERATION_FAILED, "Failed to update patient password");
-        }
-        patientRepository.save(updatedPatient);
-        return PasswordResetResponse.builder()
-                .id(updatedPatient.getId())
-                .message("Patient password reset successfully")
-                .build();
-    }
+    //     Patient updatedPatient = patient.toBuilder()
+    //             .password(passwordEncoder.encode(request.getNewPassword()))
+    //             .build();
+    //     if(updatedPatient == null) {
+    //         throw new BaseException(ErrorCode.OPERATION_FAILED, "Failed to update patient password");
+    //     }
+    //     patientRepository.save(updatedPatient);
+    //     return PasswordResetResponse.builder()
+    //             .id(updatedPatient.getId())
+    //             .message("Patient password reset successfully")
+    //             .build();
+    // }
+
+    // @Override
+    // @Transactional
+    // public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
+    //     if (id == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Patient ID cannot be null");
+    //     }
+    //     if (request == null || request.getNewPassword() == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request with new password is required");
+    //     }
+
+    //     Patient patient = patientRepository.findById(id)
+    //             .orElseThrow(() -> new BaseException(ErrorCode.PATIENT_NOT_FOUND, "Patient with ID " + id + " not found"));
+
+    //     if (request.getCurrentPassword() == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is required for verification");
+    //     }
+
+    //     if (!passwordEncoder.matches(request.getCurrentPassword(), patient.getPassword())) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Current password is incorrect");
+    //     }
+
+    //     Patient updatedPatient = patient.toBuilder()
+    //             .password(passwordEncoder.encode(request.getNewPassword()))
+    //             .build();
+    //     if(updatedPatient == null) {
+    //         throw new BaseException(ErrorCode.OPERATION_FAILED, "Failed to update patient password");
+    //     }
+    //     patientRepository.save(updatedPatient);
+    //     return PasswordResetResponse.builder()
+    //             .id(updatedPatient.getId())
+    //             .message("Patient password reset successfully")
+    //             .build();
+    // }
 
     @Override
     @Transactional

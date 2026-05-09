@@ -8,11 +8,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.project.hospitalsystem.Entity.User;
 
 import lombok.Getter;
 
-@Getter
+@Getter 
 public class UserPrincipal implements UserDetails {
     private final Long id;
     private final String email;

@@ -1,14 +1,15 @@
 package com.project.hospitalsystem.Exception;
 
 public class BaseException extends RuntimeException {
-    private final ErrorCode errorCode;
 
-    public BaseException(ErrorCode errorCode, String details) {
-        super(details);
-        this.errorCode = errorCode;
-    }
+	private final ErrorCode errorCode;
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
-    }
+	public BaseException(ErrorCode errorCode, String message) {
+		super(message);
+		this.errorCode = errorCode;
+	}
+
+	public ErrorCode getErrorCode() {
+		return errorCode;
+	}
 }
