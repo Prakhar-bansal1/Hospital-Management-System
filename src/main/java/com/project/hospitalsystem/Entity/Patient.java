@@ -50,21 +50,21 @@ public class Patient {
     @Column(nullable = false, updatable = false)
     private Long id;
 
+    @Column(unique = true)
+    private String userId;
+
     @Setter
     @Column(nullable = false, length = 100)
     private String name;
 
     @Setter
     @Column(nullable = false, length = 10)
-    // Not all family members may have a phone number, so we won't use "Unique
-    // property" , but we will ensure that only two accounts can share the same phone number.
     private String phoneNumber;
 
     @Column(nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
     private GenderType gender;
 
-    // Not all patients may have an email, so we won't use @Notblank in email.
     @Setter
     @Column(unique = true)
     private String email;

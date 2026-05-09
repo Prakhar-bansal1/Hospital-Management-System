@@ -17,8 +17,6 @@ import com.project.hospitalsystem.Mapper.HospitalMapper;
 import com.project.hospitalsystem.Model.DoctorRequest;
 import com.project.hospitalsystem.Model.DoctorResponse;
 import com.project.hospitalsystem.Model.DoctorSummaryModel;
-import com.project.hospitalsystem.Model.PasswordResetRequest;
-import com.project.hospitalsystem.Model.PasswordResetResponse;
 import com.project.hospitalsystem.Repo.AppointmentRepository;
 import com.project.hospitalsystem.Repo.DepartmentRepository;
 import com.project.hospitalsystem.Repo.DoctorRepository;
@@ -85,26 +83,40 @@ public class DoctorServiceImpl implements DoctorService {
         return hospitalMapper.mapDoctorResponse(saveDoctor);
     }
 
-    @Override
-    @Transactional
-    public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
-        if (id == null) {
-            throw new BaseException(ErrorCode.INVALID_INPUT, "Doctor ID cannot be null");
-        }
-        if (request == null || request.getNewPassword() == null) {
-            throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request is invalid");
-        }
+    // @Override
+    // @Transactional
+    // public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
+    //     if (id == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Doctor ID cannot be null");
+    //     }
+    //     if (request == null || request.getNewPassword() == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request is invalid");
+    //     }
 
-        Doctor doctor = doctorRepository.findById(id)
-                .orElseThrow(() -> new BaseException(ErrorCode.DOCTOR_NOT_FOUND, "Doctor not found with ID: " + id));
-        doctor.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        doctorRepository.save(doctor);
+    //     Doctor doctor = doctorRepository.findById(id)
+    //             .orElseThrow(() -> new BaseException(ErrorCode.DOCTOR_NOT_FOUND, "Doctor not found with ID: " + id));
+    //     doctor.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    //     doctorRepository.save(doctor);
+   
+    // @Override
+    // @Transactional
+    // public PasswordResetResponse resetPassword(Long id, PasswordResetRequest request) {
+    //     if (id == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Doctor ID cannot be null");
+    //     }
+    //     if (request == null || request.getNewPassword() == null) {
+    //         throw new BaseException(ErrorCode.INVALID_INPUT, "Password reset request is invalid");
+    //     }
 
-        return PasswordResetResponse.builder()
-                .id(doctor.getId())
-                .message("Doctor password reset successfully")
-                .build();
-    }
+    //     Doctor doctor = doctorRepository.findById(id)
+    //             .orElseThrow(() -> new BaseException(ErrorCode.DOCTOR_NOT_FOUND, "Doctor not found with ID: " + id));
+    //     doctor.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    //     doctorRepository.save(doctor);
+    //     return PasswordResetResponse.builder()
+    //             .id(doctor.getId())
+    //             .message("Doctor password reset successfully")
+//             .build();
+    // }
 
     @Override
     public DoctorResponse getDoctorById(Long id) {
