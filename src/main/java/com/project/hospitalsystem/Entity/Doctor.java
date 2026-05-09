@@ -42,6 +42,9 @@ public class Doctor {
     @Column(nullable = false, updatable = false)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String userId;
+
     @Column(nullable = false, length = 100)
     private String name;
 
